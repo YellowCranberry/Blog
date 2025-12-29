@@ -1,8 +1,0 @@
-1a.created few basic templates like base and index
-also added navbar and footer
-dependencies intstalled till now - is flask
-#some problems faced - having two init files is confusing
-
-1b.deleted all the stupid directories as i was worried sick about these directories so del them
-
-
