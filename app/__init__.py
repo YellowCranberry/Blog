@@ -2,6 +2,10 @@ from flask import Flask
 from flask_moment import Moment
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
+from .auth import auth
+from .main import main
+from .extensions import db
+
 
 #creating instances of class
 app = Flask(__name__)
@@ -13,8 +17,14 @@ app.config['SECRET_KEY']='hard to guess string'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user_data.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #ye kya krta hai ab?
 
-#database
-db = SQLAlchemy(app)#isko alag se intialize krna pda 
+# #database
+# db = SQLAlchemy(app)#isko alag se intialize krna pda 
+db.init_app(app)
+
+
+#blueprints
+app.register_blueprint(auth,url_prefix='/bhavya')
+app.register_blueprint(main,url_prefix='/home')
 
 #run
 if __name__=="__main__":
