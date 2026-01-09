@@ -1,0 +1,41 @@
+from flask import Flask,render_template
+from flask_moment import Moment
+from flask_bootstrap import Bootstrap
+from flask_sqlalchemy import SQLAlchemy
+from config import config
+from flask_migrate import Migrate
+#creating instances of class
+moment = Moment()
+bootstrap = Bootstrap()
+db = SQLAlchemy()
+migrate = Migrate()
+
+
+
+# #configuration
+# app.config['SECRET_KEY']='hard to guess string'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user_data.sqlite'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #ye kya krta hai ab?
+
+
+
+def create_app(config_name):
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
+
+    bootstrap.init_app(app)
+    moment.init_app(app)
+    db.init_app(app)
+    migrate.init_app(app,db)
+
+    from .main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+    from .auth import auth as auth_blueprint
+    app.register_blueprint(auth_blueprint)
+
+    from .models import User,BlogForm #why did i put it here to avoid circular import and that alembic thing otherwise it wont migrate database
+    # print("Using DB:", app.config['SQLALCHEMY_DATABASE_URI']) #for finding the Database location and name
+    
+
+    return app

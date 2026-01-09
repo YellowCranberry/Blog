@@ -7,23 +7,12 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{{url_for('index')}}">Home</a>
+          <a class="nav-link active" aria-current="page" href="{{url_for('main.index')}}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{url_for('register')}}">register</a>
+          <a class="nav-link active" aria-current="page" href="{{url_for('main.write_blog')}}">write_blog</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{url_for('Create_blog')}}" >create</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{url_for('newform')}}" >form</a>
-        </li>
-        
       </ul>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
     </div>
   </div>
 </nav>

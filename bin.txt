@@ -1,0 +1,60 @@
+
+    
+
+@app.route('/newform',methods=['GET','POST'])
+def newform():
+    form = User_registration_form()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email =form.email.data).first()
+        if user is None:
+            items_to_add =[User(username = form.name.data,email =form.email.data,password=form.password.data)]
+            db.session.add_all(items_to_add)
+            db.session.commit()
+            flash('user registered successfully','success')
+        else:
+            flash('user already registered','warning')
+        return redirect(url_for("newform"))
+    return render_template("form.html",form=form)    
+
+
+
+@app.route("/register",methods=['GET','POST'])
+def register():
+    form = User_registration_form()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            user = User(username=form.name.data,email = form.email.data,password=form.password.data)
+            db.session.add(user)
+            db.session.commit()    
+            session['known']=False
+        else:
+            session['known']=True
+        #now add session so that when reload we go into a get request
+        session['name']=form.name.data
+        session['email']=form.email.data
+        session['pass']=form.password.data
+        return redirect(url_for('register'))
+    return render_template('registration.html',form=form,name=session.get('name'),email=session.get('email'),password=session.get('pass'),known=session.get('known'))
+
+
+
+#classes
+class User_registration_form(FlaskForm):
+    name = StringField('Username',validators=[DataRequired(),Length(max=100)])
+    email = StringField('Email',validators=[DataRequired()])
+    password = PasswordField('password',validators=[DataRequired(),Length(min=7,max=23)])
+    submit = SubmitField('Submit')
+
+
+class Blog(FlaskForm):
+    id=None
+    title= StringField('title',validators=[DataRequired(),Length(max=100)])
+    description=TextAreaField('description',validators=[DataRequired(),Length(min=30,max=1000)])
+    tags=None
+    submit=SubmitField('submit')
+    
+
+
+
+    
