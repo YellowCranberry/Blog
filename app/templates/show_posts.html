@@ -1,0 +1,19 @@
+{%extends 'basic/base.html'%}
+{% import "bootstrap/wtf.html" as wtf %}
+{%block title%}write{%endblock%}
+
+{%block page_content%}
+<h1>Posts</h1>
+{%endblock%}
+
+{%block content%}
+{{super()}}
+{%for blog in blogs%}
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <a class="card-title" href="{{url_for('main.newpost',id=blog.id)}}">{{ blog.title }}</a>
+        <p class="card-text">{{ blog.slug }}</p>
+    </div>
+</div>
+{%endfor%}
+{%endblock%}

@@ -1,11 +1,15 @@
-{% extends 'basic/base.html'%}
-
+{%extends "basic/base.html"%}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {%block title%}login{%endblock%}
 
 {%block page_content%}
-<br>
-<h1>Login</h1>
-<br>
-
+<h1>login</h1><br>
+{{ wtf.quick_form(form) }}
+<br><br>
+<a href="{{url_for('auth.register')}}">register</a>
 {%endblock%}
+
+
+
+

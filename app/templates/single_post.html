@@ -1,0 +1,20 @@
+{%extends 'basic/base.html'%}
+
+{%block title%}post{%endblock%}
+
+{%block page_content%}
+<div class="card mb-3 shadow-sm">
+    <a href="{{ url_for('main.editpost', id=blog.id) }}"
+       class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-2">
+        Edit
+    </a>
+    <a href="{{ url_for('main.deletePost', id=blog.id) }}"
+       class="btn btn-sm btn-outline-primary position-absolute bottom-0 end-0 m-2">
+        delete
+    </a>
+    <div class="card-body">
+        <h1 class="card-title">{{ blog.title }}</h1>
+        <p class="card-text">{{ blog.description }}</p>
+    </div>
+</div>
+{%endblock%}

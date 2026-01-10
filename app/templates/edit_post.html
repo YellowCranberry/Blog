@@ -1,0 +1,25 @@
+{%extends 'basic/base.html'%}
+{% import "bootstrap/wtf.html" as wtf %}
+{%block title%}edit{%endblock%}
+
+{%block page_content%}
+<h1>Edit</h1>
+<br><br>
+<div>
+   <form action="{{url_for('main.editpost',id=blog.id)}}" method="POST">
+    {{form.hidden_tag()}}
+
+    {{form.title.label(class='form-label')}}
+    {{form.title(class='form-control')}}
+
+    {{form.slug.label(class='form-label')}}
+    {{form.slug(class='form-control')}}
+   
+    {{form.description.label(class='form-label')}}
+    {{form.description(class='form-control')}}
+    <br>
+    {{form.submit(class='btn btn-secondary')}}
+</form>
+</div>
+
+{%endblock%}

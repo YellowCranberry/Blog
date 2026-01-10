@@ -23,11 +23,12 @@ class User(UserMixin,db.Model):
         return check_password_hash(self.hashed_password, password)
 
 
-class BlogForm(db.Model):
+class Blog(db.Model):
     __tablename__='blog'
     id = db.Column(db.Integer,primary_key=True)
     title =db.Column(db.String(100),nullable=False)
     description =db.Column(db.String(255),nullable=False)
+    slug = db.Column(db.String(100))
     date_added = db.Column(db.DateTime(timezone=True),default=lambda: datetime.now(timezone.utc))
     
 

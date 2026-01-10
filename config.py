@@ -12,9 +12,6 @@ class Config:
     def init_app(app):
         pass
 
-
-
-
 class DevelopmentConfig(Config):
     DEBUG = True
     MAIL_SERVER = 'smtp.googlemail.com'
