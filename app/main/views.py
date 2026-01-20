@@ -1,6 +1,6 @@
 from . import main
 from flask import render_template,redirect,url_for,request,session,flash
-from flask_login import login_required
+from flask_login import login_required,current_user
 from ..models import User,Blog
 from .forms import writeBlog_form
 from .. import db
@@ -17,15 +17,15 @@ def mypage():
     return 'only verified'
 
 @main.route('/blog',methods=['GET','POST'])
+@login_required
 def write_blog():
     form = writeBlog_form()
     if form.validate_on_submit():
-        items_to_add = Blog(title = form.title.data,description=form.description.data,slug=form.slug.data)
+        items_to_add = Blog(title = form.title.data,description=form.description.data,slug=form.slug.data,author = current_user)
         db.session.add(items_to_add)
         db.session.commit()
         return redirect(url_for('main.write_blog'))
-    blogs = Blog.query.order_by(Blog.date_added.desc()).all()
-    return render_template('write_blog.html',form = form,blogs = blogs) 
+    return render_template('write_blog.html',form = form) 
 
 @main.route('/posts')
 def posts():
@@ -41,9 +41,14 @@ def newpost(id):
         return f"some error occured"
 
 @main.route('/posts/edit/<int:id>',methods=['GET','POST'])
+@login_required
 def editpost(id):
-    blog = Blog.query.filter_by(id=id).first()
+    blog = Blog.query.get_or_404(id)
+    if blog.author != current_user:
+        flash('u don\'t have access to edit this post')
+        return redirect(url_for('main.newpost',id=id))
     form = writeBlog_form(obj=blog)
+    # or you can just copy paste values of blog into form
     if form.validate_on_submit():
         # blog.title=form.title.data
         # blog.slug=form.slug.data
@@ -54,12 +59,30 @@ def editpost(id):
     return render_template('edit_post.html',blog = blog,form=form)
 
 @main.route('/posts/delete/<int:id>')
+@login_required
 def deletePost(id):
     blog_to_delete = Blog.query.get_or_404(id)
+    if blog_to_delete.author !=current_user:
+        flash("u dont have access to delete this post")
+        return redirect(url_for('main.newpost',id=id))
     try:
         db.session.delete(blog_to_delete)
         db.session.commit()
         flash("Blog deleted successfully",'warning')
         return redirect(url_for('.posts'))
     except:
-        return f"some problem occured i think"
+        return f"some problem occured i think"  
+
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    
+    return render_template('dashboard.html')
+
+
+# @main.route("/deleteit")
+# def deleteit():
+#     User.query.delete()
+#     db.session.commit()
+#     return "done"
+

@@ -3,24 +3,21 @@ from . import auth
 from .forms import LoginForm,RegistrationForm
 from ..models import User
 from .. import db
+from flask_login import login_user, logout_user,login_required
+
+
 
 @auth.route('/login',methods =['GET','POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user is None:
-            flash('user not found','warning')
-            return redirect(url_for('auth.register'))
+        if user.verify_password(form.password.data):
+            login_user(user)   
+            return redirect(url_for('main.dashboard'))
         else:
-            if user.verify_password(form.password.data):
-                session['known']=True
-                session['email']=form.email.data   
-                return redirect(url_for('main.index'))
-            else:
-                session['known']=False
-                flash('wrong email or password','warning')
-                return redirect(url_for('auth.register'))
+            flash('wrong email or password','warning')
+            return redirect(url_for('auth.login'))
     return render_template('login.html',form=form)
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -38,3 +35,11 @@ def register():
             return redirect(url_for('auth.login'))
 
     return render_template('registration.html', form=form)
+
+
+@auth.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('you have been logged out','success')
+    return redirect(url_for('auth.login'))
