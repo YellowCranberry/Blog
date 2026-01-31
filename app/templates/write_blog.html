@@ -2,6 +2,11 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {%block title%}write{%endblock%}
 
+{% block head%}
+{{super()}}
+{{ ckeditor.load() }} 
+{%endblock%}
+
 {%block page_content%}
 <div>
    {{ wtf.quick_form(form) }}

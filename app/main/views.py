@@ -2,7 +2,7 @@ from . import main
 from flask import render_template,redirect,url_for,request,session,flash
 from flask_login import login_required,current_user
 from ..models import User,Blog
-from .forms import writeBlog_form
+from .forms import writeBlog_form,Search_form
 from .. import db
 
 @main.route('/')
@@ -85,4 +85,26 @@ def dashboard():
 #     User.query.delete()
 #     db.session.commit()
 #     return "done"
+
+
+# for search-bar to get searchform we initialized in context processor so its avail everywhere now with search_form name  
+@main.app_context_processor
+def pass_formto_searchbar():
+    form = Search_form()
+    return dict(search_form=form)
+
+
+@main.route("/search" ,methods =["GET","POST"])
+def search():
+    form = Search_form()
+    if form.validate_on_submit():
+        session['description']= form.search.data
+        return redirect(url_for('.search'))
+    description = session.pop('description',None)
+    if not description:
+        return redirect(url_for('main.index'))
+    blogs = Blog.query
+    blogs = blogs.filter(Blog.description.like('%'+description+'%'))
+    blogs = blogs.order_by(Blog.title).all()
+    return render_template('search.html',form =form,blogs=blogs)
 

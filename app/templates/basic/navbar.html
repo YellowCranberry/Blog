@@ -23,6 +23,11 @@
           {%endif%}
         </li>
       </ul>
+      <form class="form-inline my-2 my-lg-0" action="{{url_for('main.search')}}" method="POST">
+        {{search_form.hidden_tag()}}
+      {{search_form.search(class="form-control")}}
+      {{search_form.submit(class="btn btn-outline-secondary")}}
+    </form>
     </div>
   </div>
 </nav>

@@ -2,6 +2,8 @@
 
 {%block title%}post{%endblock%}
 
+
+
 {%block page_content%}
 <div class="card mb-3 shadow-sm">
     <a href="{{ url_for('main.editpost', id=blog.id) }}"
@@ -14,7 +16,7 @@
     </a>
     <div class="card-body">
         <h1 class="card-title">{{ blog.title }}</h1>
-        <p class="card-text">{{ blog.description }}</p>
+        <p class="card-text">{{ blog.description | safe }}</p>
     </div>
 </div>
 {%endblock%}

@@ -1,0 +1,20 @@
+{% extends "basic/base.html" %}
+{% block content %}
+    {{ super() }}
+    {% if blogs %}
+        <p>you searched for</p>
+        {% for blog in blogs %}
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <a class="card-title"
+                       href="{{ url_for('main.newpost', id=blog.id) }}">
+                        {{ blog.title }}
+                    </a>
+                    <p class="card-text">{{ blog.slug }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Nothing seems to match your query</p>
+    {% endif %}
+{% endblock %}
