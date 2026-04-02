@@ -3,12 +3,15 @@ from flask import render_template,redirect,url_for,request,session,flash
 from flask_login import login_required,current_user
 from ..models import User,Blog
 from .forms import writeBlog_form,Search_form
-from .. import db
+from .. import db, cache
+
 
 @main.route('/')
+@cache.cached( timeout =50)
 def index():
-
-    return render_template('index.html')
+    blogs = Blog.query.order_by(Blog.id.desc())[0:2]
+    # print(type(blogs))
+    return render_template('index.html',blogs=blogs)
 
 
 @main.route('/mypage')
@@ -27,10 +30,6 @@ def write_blog():
         return redirect(url_for('main.write_blog'))
     return render_template('write_blog.html',form = form) 
 
-@main.route('/posts')
-def posts():
-    blogs = Blog.query.order_by(Blog.id).all()
-    return render_template('show_posts.html',blogs = blogs)
 
 @main.route('/posts/<int:id>')
 def newpost(id):
@@ -73,11 +72,7 @@ def deletePost(id):
     except:
         return f"some problem occured i think"  
 
-@main.route('/dashboard')
-@login_required
-def dashboard():
-    
-    return render_template('dashboard.html')
+
 
 
 # @main.route("/deleteit")
@@ -85,6 +80,7 @@ def dashboard():
 #     User.query.delete()
 #     db.session.commit()
 #     return "done"
+
 
 
 # for search-bar to get searchform we initialized in context processor so its avail everywhere now with search_form name  
@@ -108,3 +104,33 @@ def search():
     blogs = blogs.order_by(Blog.title).all()
     return render_template('search.html',form =form,blogs=blogs)
 
+
+
+
+
+
+
+
+
+
+##mayank
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    # Filter directly by the database column 'author_id' matching the logged-in user's ID
+    user_blogs = Blog.query.filter_by(author_id=current_user.id).order_by(Blog.id.desc()).all()
+    
+    return render_template('dashboard.html', blogs=user_blogs)
+
+
+@main.route('/posts')
+def posts():
+    # 1. Grab the page number from the URL (default to 1 if it doesn't exist)
+    page = request.args.get('page', 1, type=int)
+    
+    # 2. Use .paginate() instead of .all()
+    # per_page=4 sets the limit. error_out=False prevents crashing if a user types ?page=1000
+    # I also added .desc() so your newest posts show up first!
+    blogs = Blog.query.order_by(Blog.id.desc()).paginate(page=page, per_page=4, error_out=False)
+    
+    return render_template('show_posts.html', blogs=blogs)

@@ -1,8 +1,7 @@
+{# 
 {%extends 'basic/base.html'%}
 {% import "bootstrap/wtf.html" as wtf %}
 {%block title%}posts{%endblock%}
-
-
 
 {%block page_content%}
 <h1>Posts</h1>
@@ -18,4 +17,103 @@
     </div>
 </div>
 {%endfor%}
-{%endblock%}
+{%endblock%} 
+#}
+
+
+
+
+
+
+
+
+
+
+
+<!-- mayank -->
+
+{% extends 'basic/base.html' %}
+
+{% block title %}All Posts{% endblock %}
+
+{% block page_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-secondary">Latest Posts</h1>
+</div>
+
+<div class="row">
+    {% for blog in blogs.items %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm border-0 bg-light">
+            <div class="card-body">
+                <h4 class="card-title">
+                    <a href="{{ url_for('main.newpost', id=blog.id) }}" class="text-decoration-none text-dark fw-bold">
+                        {{ blog.title }}
+                    </a>
+                </h4>
+                
+                <h6 class="card-subtitle mb-3 text-muted">
+                    By <strong>{{ blog.author.username }}</strong> &bull; {{ blog.date_added.strftime('%b %d, %Y') }}
+                </h6>
+                
+                <p class="card-text text-muted">{{ blog.slug }}</p>
+            </div>
+            
+            <div class="card-footer bg-transparent border-0 text-end">
+                <a href="{{ url_for('main.newpost', id=blog.id) }}" class="btn btn-sm btn-outline-secondary">Read More &rarr;</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-secondary">No posts available yet. Be the first to write one!</div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="d-flex justify-content-center mt-5 mb-5">
+    <nav aria-label="Post navigation">
+        <ul class="pagination pagination-sm gap-2">
+            
+            {% if blogs.has_prev %}
+                <li class="page-item">
+                    <a class="page-link rounded shadow-sm border-0 text-dark fw-semibold" href="{{ url_for('main.posts', page=blogs.prev_num) }}">&laquo; Prev</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link rounded shadow-sm border-0 bg-light text-muted fw-semibold">&laquo; Prev</span>
+                </li>
+            {% endif %}
+
+            {% for page_num in blogs.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    {% if blogs.page == page_num %}
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link rounded shadow-sm border-0 bg-secondary text-white fw-bold">{{ page_num }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link rounded shadow-sm border-0 text-dark fw-semibold" href="{{ url_for('main.posts', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link rounded border-0 bg-transparent text-muted fw-bold">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if blogs.has_next %}
+                <li class="page-item">
+                    <a class="page-link rounded shadow-sm border-0 text-dark fw-semibold" href="{{ url_for('main.posts', page=blogs.next_num) }}">Next &raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link rounded shadow-sm border-0 bg-light text-muted fw-semibold">Next &raquo;</span>
+                </li>
+            {% endif %}
+            
+        </ul>
+    </nav>
+</div>
+{% endblock %}
