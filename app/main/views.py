@@ -1,5 +1,5 @@
 from . import main
-from flask import render_template,redirect,url_for,request,session,flash
+from flask import render_template,redirect,url_for,request,session,flash, current_app
 from flask_login import login_required,current_user
 from ..models import User,Blog
 from .forms import writeBlog_form,Search_form
@@ -24,9 +24,24 @@ def mypage():
 def write_blog():
     form = writeBlog_form()
     if form.validate_on_submit():
-        items_to_add = Blog(title = form.title.data,description=form.description.data,slug=form.slug.data,author = current_user)
-        db.session.add(items_to_add)
+        new_blog = Blog(
+            title=form.title.data,
+            description=form.description.data,
+            slug=form.slug.data,
+            author=current_user
+        )
+        db.session.add(new_blog)
         db.session.commit()
+
+        current_app.search_engine.ingest_text(
+            text=form.description.data,
+            metadata={
+                "title": form.title.data,
+                "slug": form.slug.data,
+                "id": new_blog.id
+            }
+        )
+
         return redirect(url_for('main.write_blog'))
     return render_template('write_blog.html',form = form) 
 
@@ -94,15 +109,18 @@ def pass_formto_searchbar():
 def search():
     form = Search_form()
     if form.validate_on_submit():
-        session['description']= form.search.data
+        session['query']= form.search.data
         return redirect(url_for('.search'))
-    description = session.pop('description',None)
-    if not description:
+    query_text = session.pop('query', None)
+    if not query_text:
         return redirect(url_for('main.index'))
-    blogs = Blog.query
-    blogs = blogs.filter(Blog.description.like('%'+description+'%'))
-    blogs = blogs.order_by(Blog.title).all()
-    return render_template('search.html',form =form,blogs=blogs)
+    
+    results = current_app.search_engine.search(query_text, top_k=5)
+    return render_template('search.html', form=form, results=results, query=query_text)
+    # blogs = Blog.query
+    # blogs = blogs.filter(Blog.description.like('%'+description+'%'))
+    # blogs = blogs.order_by(Blog.title).all()
+    # return render_template('search.html',form =form,blogs=blogs)
 
 
 

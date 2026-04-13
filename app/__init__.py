@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager,login_user
 from flask_ckeditor import CKEditor
 from flask_caching import Cache
-
+from dev.core.engine import HybridSearchEngine
 
 
 #creating instances of class
@@ -18,7 +18,7 @@ migrate = Migrate()
 login_manager=LoginManager()
 ckeditor = CKEditor()
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
-
+search_engine = None
 
 
 # #configuration
@@ -44,6 +44,12 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint)
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
+
+    # INITIALIZE SEARCH ENGINE
+    # global search_engine
+    app.search_engine = HybridSearchEngine(
+        db_url="postgresql+psycopg://postgres:1234@localhost:5433/vectordb"
+    )
 
     from .models import User,Blog #why did i put it here to avoid circular import and that alembic thing otherwise it wont migrate database
     # print("Using DB:", app.config['SQLALCHEMY_DATABASE_URI']) #for finding the Database location and name
