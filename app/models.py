@@ -34,3 +34,6 @@ class Blog(db.Model):
     #foriegn key to link to users
     author_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
+
+
+    

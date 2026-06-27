@@ -2,6 +2,11 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {%block title%}edit{%endblock%}
 
+{% block head%}
+{{super()}}
+{{ ckeditor.load() }} 
+{%endblock%}
+
 {%block page_content%}
 <h1>Edit</h1>
 <br><br>
