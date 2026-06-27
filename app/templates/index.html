@@ -3,4 +3,13 @@
 {%block page_content%}
 <br>
 <h1>Welcome to my blog</h1>
+<br><br><br><br>
+{%for blog in blogs%}
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <a class="card-title" href="{{url_for('main.newpost',id=blog.id)}}">{{ blog.title }}</a>
+            <p class="card-text">{{ blog.slug }}</p>
+        </div>
+    </div>
+{%endfor%}
 {%endblock%}

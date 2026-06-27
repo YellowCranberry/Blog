@@ -1,3 +1,4 @@
+{# 
 {%extends 'basic/base.html'%}
 
 {%block title%}post{%endblock%}
@@ -14,7 +15,56 @@
     </a>
     <div class="card-body">
         <h1 class="card-title">{{ blog.title }}</h1>
-        <p class="card-text">{{ blog.description }}</p>
+        <p class="card-text">{{ blog.description | safe }}</p>
     </div>
 </div>
-{%endblock%}
+{%endblock%} 
+#}
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- mayank -->
+
+{% extends 'basic/base.html' %}
+
+{% block title %}{{ blog.title }}{% endblock %}
+
+{% block page_content %}
+<div class="card border-0 shadow-sm p-3 mt-3">
+    <div class="card-body">
+        
+        <h1 class="card-title fw-bold text-dark">{{ blog.title }}</h1>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+            <span class="text-muted">
+                Written by <strong>{{ blog.author.username }}</strong> on {{ blog.date_added.strftime('%B %d, %Y') }}
+            </span>
+            
+            {% if current_user.is_authenticated and current_user.id == blog.author.id %}
+            <div>
+                <a href="{{ url_for('main.editpost', id=blog.id) }}" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
+                <a href="{{ url_for('main.deletePost', id=blog.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this post? This cannot be undone.');">Delete</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-text fs-5" style="line-height: 1.8;">
+            {{ blog.description | safe }}
+        </div>
+        
+        <div class="mt-5">
+            <a href="{{ url_for('main.posts') }}" class="btn btn-light">&larr; Back to all posts</a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
