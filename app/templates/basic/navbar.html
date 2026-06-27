@@ -25,6 +25,11 @@
           <a class="nav-link active" aria-current="page" href="{{url_for('auth.login')}}">login</a>
           {%endif%}
         </li>
+        {%if current_user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link text-info" href="{{url_for('main.search_metrics')}}">⏱ Metrics</a>
+        </li>
+        {%endif%}
       </ul>
       <form class="form-inline my-2 my-lg-0" action="{{url_for('main.search')}}" method="POST">
         {{search_form.hidden_tag()}}

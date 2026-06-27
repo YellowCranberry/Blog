@@ -1,0 +1,60 @@
+{% extends "basic/base.html" %}
+{% block title %}Admin Login — Search Metrics{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+  .admin-card {
+    max-width: 400px;
+    margin: 80px auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.12);
+  }
+  .admin-card .card-header {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: #fff;
+    border-radius: 12px 12px 0 0;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .admin-card .card-body { padding: 2rem; }
+  .lock-icon { font-size: 2.5rem; margin-bottom: .5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+<div class="container">
+  <div class="card admin-card">
+    <div class="card-header">
+      <div class="lock-icon">🔒</div>
+      <h5 class="mb-0">Admin Access Required</h5>
+      <small class="opacity-75">Search Metrics Dashboard</small>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('main.search_metrics') }}">
+        <div class="mb-3">
+          <label for="admin_password" class="form-label fw-semibold">Admin Password</label>
+          <input type="password"
+                 class="form-control form-control-lg"
+                 id="admin_password"
+                 name="admin_password"
+                 placeholder="Enter admin password"
+                 autofocus
+                 required>
+          <div class="form-text text-muted">
+            Set via <code>ADMIN_PASSWORD</code> environment variable.<br>
+            Default: <code>admin123</code> (change this in production!)
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 btn-lg">
+          Unlock Dashboard
+        </button>
+      </form>
+      <div class="text-center mt-3">
+        <a href="{{ url_for('main.index') }}" class="text-muted small">← Back to Blog</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

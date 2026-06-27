@@ -7,7 +7,35 @@ class Config:
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
-    
+
+    # ------------------------------------------------------------------
+    # Hybrid Search Extension Configuration
+    # ------------------------------------------------------------------
+    # PostgreSQL vector DB URL (required for search to work)
+    HYBRID_SEARCH_DB_URL = (
+        os.environ.get('HYBRID_SEARCH_DB_URL')
+        or 'postgresql+psycopg://postgres:1234@localhost:5433/vectordb'
+    )
+    # pgvector collection name (think of it like a table namespace)
+    HYBRID_SEARCH_COLLECTION = (
+        os.environ.get('HYBRID_SEARCH_COLLECTION') or 'blog_search_docs'
+    )
+    # HuggingFace embedding model — change to a larger model for better quality
+    HYBRID_SEARCH_EMBEDDING_MODEL = (
+        os.environ.get('HYBRID_SEARCH_EMBEDDING_MODEL')
+        or 'sentence-transformers/all-MiniLM-L6-v2'
+    )
+    # Set to '' or remove to disable the local LLM (search-only mode)
+    HYBRID_SEARCH_LLM_MODEL = os.environ.get('HYBRID_SEARCH_LLM_MODEL', '')
+    # How many metrics events to keep in memory for the admin dashboard
+    HYBRID_SEARCH_METRICS_MAXLEN = 200
+    # Logging level for all hybrid_search.* loggers
+    HYBRID_SEARCH_LOG_LEVEL = os.environ.get('HYBRID_SEARCH_LOG_LEVEL', 'INFO')
+
+    # Admin password for protected routes like /admin/search-metrics
+    # Override with ADMIN_PASSWORD environment variable in production
+    ADMIN_METRICS_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
+
     @staticmethod
     def init_app(app):
         pass

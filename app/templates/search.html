@@ -6,7 +6,17 @@
         <h3>Search Results</h3>
         <hr>
 
+        {% if metrics %}
+        <p class="text-muted small mb-3">
+            ⏱ Query time:
+            <span class="badge bg-secondary">embed {{ "%.0f"|format(metrics.embed_ms) }}ms</span>
+            <span class="badge bg-secondary">db {{ "%.0f"|format(metrics.db_ms) }}ms</span>
+            <span class="badge bg-primary">total {{ "%.0f"|format(metrics.total_ms) }}ms</span>
+        </p>
+        {% endif %}
+
         {# We check for 'results' which is now a list of dictionaries #}
+
         {% if results %}
             <p class="text-muted">Top AI-ranked matches for: <strong>{{ query }}</strong></p>
             
@@ -20,7 +30,7 @@
                                 {{ item['metadata']['title'] }}
                             </a>
                             <span class="badge rounded-pill bg-info text-dark">
-                                Score: {{ "%.4f"|format(item['similarity_score']) }}
+                                Score: {{ "%.4f"|format(item['score']) }}
                             </span>
                         </div>
                         

@@ -1,0 +1,161 @@
+{% extends "basic/base.html" %}
+{% block title %}Search Metrics Dashboard{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+  .metric-card { border-left: 4px solid #0d6efd; }
+  .stat-box    { background: #f8f9fa; border-radius: 8px; padding: 1rem; text-align: center; }
+  .stat-num    { font-size: 2rem; font-weight: 700; color: #0d6efd; }
+  .stat-label  { font-size: 0.8rem; color: #6c757d; text-transform: uppercase; letter-spacing: .05em; }
+  .timing-bar  { height: 6px; border-radius: 3px; background: #dee2e6; margin-top: 4px; }
+  .timing-fill { height: 100%; border-radius: 3px; background: #0d6efd; }
+  .table th    { font-size: 0.8rem; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; }
+  .ms-badge    { font-family: monospace; font-size: 0.85rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+<div class="container mt-4 mb-5">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0">🔍 Search Metrics Dashboard</h2>
+      <p class="text-muted mb-0">Live timing for the last {{ data.recent_searches|length }} searches &amp; {{ data.recent_ingests|length }} ingestion events.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-sm">← Back to Blog</a>
+      <a href="{{ url_for('main.admin_logout') }}" class="btn btn-outline-danger btn-sm">🔒 Lock Dashboard</a>
+    </div>
+  </div>
+
+  <!-- Summary stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-box shadow-sm">
+        <div class="stat-num">{{ data.recent_searches|length }}</div>
+        <div class="stat-label">Searches recorded</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-box shadow-sm">
+        <div class="stat-num">{{ "%.0f"|format(data.avg_search_ms) }}<small class="fs-5">ms</small></div>
+        <div class="stat-label">Avg search time</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-box shadow-sm">
+        <div class="stat-num">{{ data.total_chunks_ingested }}</div>
+        <div class="stat-label">Chunks ingested (session)</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-box shadow-sm">
+        <div class="stat-num">{{ "%.0f"|format(data.avg_ingest_ms) }}<small class="fs-5">ms</small></div>
+        <div class="stat-label">Avg ingest time</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Searches -->
+  <div class="card shadow-sm metric-card mb-4">
+    <div class="card-header bg-white fw-semibold">Recent Search Queries</div>
+    <div class="card-body p-0">
+      {% if data.recent_searches %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Query</th>
+              <th>Mode</th>
+              <th>Results</th>
+              <th>Embed</th>
+              <th>DB</th>
+              <th>Total</th>
+              <th>Breakdown</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in data.recent_searches %}
+            {% set max_ms = [s.total_ms, 1]|max %}
+            <tr>
+              <td class="text-muted">{{ loop.index }}</td>
+              <td><strong>{{ s.query[:60] }}{% if s.query|length > 60 %}…{% endif %}</strong></td>
+              <td>
+                <span class="badge {% if 'hybrid' in s.mode %}bg-success{% else %}bg-info text-dark{% endif %}">
+                  {{ s.mode }}
+                </span>
+              </td>
+              <td>{{ s.num_results }}</td>
+              <td class="ms-badge text-primary">{{ "%.1f"|format(s.embed_ms) }}ms</td>
+              <td class="ms-badge text-warning">{{ "%.1f"|format(s.db_ms) }}ms</td>
+              <td class="ms-badge fw-bold">{{ "%.1f"|format(s.total_ms) }}ms</td>
+              <td style="min-width:120px">
+                <div class="d-flex gap-1" style="height:8px">
+                  <div title="embed {{ '%.1f'|format(s.embed_ms) }}ms"
+                       style="width:{{ (s.embed_ms / max_ms * 100)|round }}%; background:#0d6efd; border-radius:3px;"></div>
+                  <div title="db {{ '%.1f'|format(s.db_ms) }}ms"
+                       style="width:{{ (s.db_ms / max_ms * 100)|round }}%; background:#ffc107; border-radius:3px;"></div>
+                </div>
+                <div class="text-muted" style="font-size:0.65rem; margin-top:2px">
+                  <span style="color:#0d6efd">■</span> embed &nbsp;
+                  <span style="color:#ffc107">■</span> db
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-muted p-3 mb-0">No searches recorded yet. Try searching for something!</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Recent Ingestions -->
+  <div class="card shadow-sm metric-card mb-4" style="border-left-color:#198754">
+    <div class="card-header bg-white fw-semibold">Recent Ingestion Events</div>
+    <div class="card-body p-0">
+      {% if data.recent_ingests %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Document URL / Slug</th>
+              <th>Chunks</th>
+              <th>Chunk time</th>
+              <th>Insert time</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ing in data.recent_ingests %}
+            <tr>
+              <td class="text-muted">{{ loop.index }}</td>
+              <td><code class="small">{{ ing.url[:60] }}{% if ing.url|length > 60 %}…{% endif %}</code></td>
+              <td><span class="badge bg-secondary">{{ ing.num_chunks }}</span></td>
+              <td class="ms-badge text-info">{{ "%.1f"|format(ing.chunk_ms) }}ms</td>
+              <td class="ms-badge text-warning">{{ "%.1f"|format(ing.insert_ms) }}ms</td>
+              <td class="ms-badge fw-bold">{{ "%.1f"|format(ing.total_ms) }}ms</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-muted p-3 mb-0">No ingestion events recorded yet. Create a blog post to see data here!</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <p class="text-muted small text-center">
+    Metrics are stored in-memory and reset on server restart. Last {{ data.recent_searches|length }} searches and {{ data.recent_ingests|length }} ingestions shown.
+  </p>
+
+</div>
+{% endblock %}
